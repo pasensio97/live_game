@@ -1,5 +1,5 @@
 # live_game
-Implementation of the Live Game in Python
+Implementation of the John Conway's Game of Live in Python
 
 You need:
   - pygame
