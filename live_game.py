@@ -25,24 +25,47 @@ BLACK = (0, 0, 0)
 GREY = (25, 25, 25)
 win.fill(GREY)
 
+# Iteration number
+it = 1
+
+# Control vars
+clock = pygame.time.Clock()
+run = True
+isPuased = True
+time_now = time.clock()
+
 # Game State; 0 dead, 1 live
 global gameState
 gameState = np.zeros((nxC, nyC))
 
-# automata palo
-gameState[5, 5] = 1
-gameState[5, 6] = 1
-gameState[5, 7] = 1
+# # Stick init
+# gameState[10, 8] = 1
+# gameState[10, 9] = 1
+# gameState[10, 10] = 1
 
-gameState[12, 12] = 1
-gameState[13, 12] = 1
-gameState[14, 12] = 1
+# cool init
+gameState[8, 7] = 1
+gameState[8, 8] = 1
+gameState[9, 8] = 1
+gameState[8, 11] = 1
+gameState[9, 11] = 1
+gameState[10, 11] = 1
 
 # Setup game loop
 LPS = 1  # Loops per second
 FPS = 30
-clock = pygame.time.Clock()
-run = True
+
+# Draw actual gameState
+def draw_actualState(gameState):
+    for y in range(0, nyC):
+        for x in range(0, nxC):
+            # Drawing rect
+            rect = [(y) * dimY, (x) * dimX, dimY, dimX]
+            if gameState[x][y] == 0:
+                pygame.draw.rect(win, BLACK, rect, 1)
+            else:
+                pygame.draw.rect(win, WHITE, rect, 0)
+
 
 # Game function
 def game(gameState):
@@ -80,28 +103,36 @@ def game(gameState):
     return gameState
 
 
-# Control vars
-pauseState = False
-time_now = time.clock()
+# First frame
+win.fill(GREY)
+draw_actualState(gameState)
+pygame.display.update()
 
 while run:
-    # clock.tick(FPS)
+    clock.tick(FPS)
     win.fill(GREY)
 
     time2 = time.clock() - time_now
-    if time2 > 1.0 / LPS + 0.1 and not pauseState:
+    if time2 > 1.0 / LPS + 0.1 and not isPuased:
         gameState = game(gameState)
         pygame.display.update()
         time_now = time.clock()
+        it += 1
+        print(it)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
-            print(pos)
-        if event.type == pygame.KEYDOWN:
-            pauseState = not pauseState
+            y, x = int(pos[0] / dimY), int(pos[1] / dimX)
+            if isPuased:
+                gameState[x][y] = -gameState[x][y] + 1
+                win.fill(GREY)
+                draw_actualState(gameState)
+                pygame.display.update()
 
+        if event.type == pygame.KEYDOWN:
+            isPuased = not isPuased
 
 pygame.quit()
